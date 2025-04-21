@@ -4,13 +4,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testtest1.ui.theme.TestTest1Theme
 
+data class EventItem(val title: String, val text: String, val status: String)
+
 enum class Screen {
     Events, Tickets, Records
 }
@@ -56,6 +67,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
 
+    val eventItems = listOf(
+        EventItem("Title1", "1", "Read"),
+        EventItem("Title2", "2", "Unread"),
+        EventItem("Title3", "3", "Unread"),
+        EventItem("Title4", "4", "Unread"),
+    )
+
     var currentStep by remember { mutableStateOf(Screen.Events) }
 
     Scaffold(
@@ -70,9 +88,11 @@ fun MainScreen() {
                     Screen.Events -> {
                         Text("Events List", fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     }
+
                     Screen.Tickets -> {
                         Text("Tickets List", fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     }
+
                     else -> {
                         Text("Records List", fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     }
@@ -104,7 +124,7 @@ fun MainScreen() {
             }
         }) { innerPadding ->
         when (currentStep) {
-            Screen.Events -> Events(Modifier.padding(innerPadding))
+            Screen.Events -> Events(eventItems, Modifier.padding(innerPadding))
             Screen.Tickets -> Tickets(Modifier.padding(innerPadding))
             Screen.Records -> Records(Modifier.padding(innerPadding))
         }
@@ -114,9 +134,38 @@ fun MainScreen() {
 
 @Composable
 fun Events(
+    eventItems: List<EventItem>,
     modifier: Modifier = Modifier
 ) {
+    LazyColumn(
+        Modifier.fillMaxSize().padding(top = 60.dp),
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        items(eventItems) { item ->
+            EventItemRow(item)
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
 
+@Composable
+fun EventItemRow(item: EventItem) {
+    Row(Modifier.fillMaxWidth()) {
+        Image(
+            painterResource(R.drawable.ic_launcher_foreground),
+            contentDescription = "Event Image",
+            Modifier
+                .size(100.dp)
+                .background(Color.LightGray)
+        )
+        Spacer(Modifier.width(16.dp))
+        Column(Modifier.weight(1f)) {
+            Text(text = item.title, fontWeight = FontWeight.Bold)
+            Text(text = item.text)
+            Spacer(Modifier.height(16.dp))
+            Text(text = item.status, color = Color.Gray)
+        }
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -126,6 +175,7 @@ fun EventPreview() {
         MainScreen()
     }
 }
+
 
 @Composable
 fun Tickets(modifier: Modifier = Modifier) {
